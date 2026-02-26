@@ -1,11 +1,12 @@
 "use client";
 import Hero from "../../components/hiringportal/Hero";
 import Overview from "../../components/hiringportal/Overview";
-import HiringWorkflowSection from "../../components/hiringportal/HiringWorkflowSection";
 import WhySkillVita from "../../components/hiringportal/WhySkillVita";
 import Steps from "../../components/hiringportal/Steps";
 import Categories from "../../components/hiringportal/Categories";
 import RecruiterFAQ from "../../components/hiringportal/RecruiterFAQ";
+import RegisterSection from "../../components/hiringportal/RegisterSection";
+import VideoSection from "../../components/hiringportal/VideoSection";
 
 export default function HiringPortalPage() {
   return (
@@ -17,15 +18,16 @@ export default function HiringPortalPage() {
           __html: JSON.stringify({
             "@context": "https://schema.org",
             "@type": "WebPage",
-            "name": "Hiring Portal | SkillVita",
-            "description": "Access a curated pipeline of job ready students with portfolios built through real simulations, projects, team workflows, and capability assessments.",
-            "url": "https://main-revitalize.vercel.app/hiringportal",
-            "isPartOf": {
+            name: "Hiring Portal | SkillVita",
+            description:
+              "Access a curated pipeline of job ready students with portfolios built through real simulations, projects, team workflows, and capability assessments.",
+            url: "https://main-revitalize.vercel.app/hiringportal",
+            isPartOf: {
               "@type": "Website",
-              "name": "SkillVita",
-              "url": "https://main-revitalize.vercel.app"
-            }
-          })
+              name: "SkillVita",
+              url: "https://main-revitalize.vercel.app",
+            },
+          }),
         }}
       />
       <script
@@ -34,28 +36,29 @@ export default function HiringPortalPage() {
           __html: JSON.stringify({
             "@context": "https://schema.org",
             "@type": "SoftwareApplication",
-            "name": "SkillVita Hiring Portal",
-            "applicationCategory": "BusinessApplication",
-            "operatingSystem": "Web",
-            "description": "A hiring platform based on execution and verified proof of work rather than resumes. Discover candidates through real projects and role based simulations.",
-            "offers": {
+            name: "SkillVita Hiring Portal",
+            applicationCategory: "BusinessApplication",
+            operatingSystem: "Web",
+            description:
+              "A hiring platform based on execution and verified proof of work rather than resumes. Discover candidates through real projects and role based simulations.",
+            offers: {
               "@type": "Offer",
-              "price": "0",
-              "priceCurrency": "INR"
+              price: "0",
+              priceCurrency: "INR",
             },
-            "featureList": [
+            featureList: [
               "Post Jobs",
               "Source Profiles",
               "Evaluate Portfolios",
               "Simulated Experience Assessments",
-              "Capability Scores"
+              "Capability Scores",
             ],
-            "provider": {
+            provider: {
               "@type": "Organization",
-              "name": "SkillVita",
-              "url": "https://main-revitalize.vercel.app"
-            }
-          })
+              name: "SkillVita",
+              url: "https://main-revitalize.vercel.app",
+            },
+          }),
         }}
       />
       <script
@@ -64,21 +67,21 @@ export default function HiringPortalPage() {
           __html: JSON.stringify({
             "@context": "https://schema.org",
             "@type": "BreadcrumbList",
-            "itemListElement": [
+            itemListElement: [
               {
                 "@type": "ListItem",
-                "position": 1,
-                "name": "Home",
-                "item": "https://main-revitalize.vercel.app"
+                position: 1,
+                name: "Home",
+                item: "https://main-revitalize.vercel.app",
               },
               {
                 "@type": "ListItem",
-                "position": 2,
-                "name": "Hiring Portal",
-                "item": "https://main-revitalize.vercel.app/hiringportal"
-              }
-            ]
-          })
+                position: 2,
+                name: "Hiring Portal",
+                item: "https://main-revitalize.vercel.app/hiringportal",
+              },
+            ],
+          }),
         }}
       />
       <script
@@ -87,20 +90,21 @@ export default function HiringPortalPage() {
           __html: JSON.stringify({
             "@context": "https://schema.org",
             "@type": "Organization",
-            "name": "SkillVita",
-            "url": "https://main-revitalize.vercel.app",
-            "logo": {
+            name: "SkillVita",
+            url: "https://main-revitalize.vercel.app",
+            logo: {
               "@type": "ImageObject",
-              "url": "https://main-revitalize.vercel.app/skillvita_icon.svg"
-            }
-          })
+              url: "https://main-revitalize.vercel.app/skillvita_icon.svg",
+            },
+          }),
         }}
       />
       <Hero
         eyebrow=""
-        title={(
+        title={
           <>
-            Hire <span className="text-green-500 relative inline-block">
+            Hire{" "}
+            <span className="text-green-500 relative inline-block">
               Job
               <span className="absolute bottom-0 left-0 w-full h-1 bg-green-500/20 rounded-full blur-sm"></span>
             </span>{" "}
@@ -110,24 +114,28 @@ export default function HiringPortalPage() {
               <span className="absolute bottom-0 left-0 w-full h-1 bg-green-500/20 rounded-full blur-sm"></span>
             </span>{" "}
             <br className="hidden lg:block" />
-            With <span className="text-green-500 relative inline-block">
+            With{" "}
+            <span className="text-green-500 relative inline-block">
               Verified
               <span className="absolute bottom-0 left-0 w-full h-1 bg-green-500/20 rounded-full blur-sm"></span>
             </span>{" "}
             Execution
           </>
-        )}
+        }
         subtitle="Access job ready talent with verified proof of work so you can shortlist confidently and reduce hiring risk."
-        ctaLabel="View Profiles"
-        ctaHref="#"
+        primaryCtaLabel="Know more"
+        primaryCtaHref="#video-section"
+        secondaryCtaLabel="Login/Register"
+        secondaryCtaHref="#register-section"
       />
-      <HiringWorkflowSection />
+      {/* <HiringWorkflowSection /> */}
+      <VideoSection />
+      <RegisterSection />
+      <Steps />
       <Overview />
       <WhySkillVita />
-      <Steps />
       <Categories />
       <RecruiterFAQ />
-
     </main>
   );
 }

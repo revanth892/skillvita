@@ -91,7 +91,7 @@ export default function HiringMenu({
 
         {/* Card 2 - Hire for your company */}
         <Link
-          href="https://skill.coursevita.com/"
+          href="/hiringportal"
           onClick={onItemClick}
         >
           <motion.div
