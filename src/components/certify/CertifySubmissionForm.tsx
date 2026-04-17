@@ -20,6 +20,9 @@ const emptyForm = {
   dob: "",
 };
 
+const lightInputClass =
+  "border-gray-200 bg-white text-gray-900 placeholder:text-gray-400 [color-scheme:light] focus-visible:border-[#014051] focus-visible:ring-[#014051]/10";
+
 export function CertifySubmissionForm() {
   const [form, setForm] = useState(emptyForm);
   const [files, setFiles] = useState<File[]>([]);
@@ -112,6 +115,7 @@ export function CertifySubmissionForm() {
                 <Field label="Project Name" htmlFor="projectName" required>
                   <Input
                     id="projectName"
+                    className={lightInputClass}
                     value={form.projectName}
                     onChange={event => updateField("projectName", event.target.value)}
                     placeholder="AI Resume Screener"
@@ -122,6 +126,7 @@ export function CertifySubmissionForm() {
                 <Field label="Project ID" htmlFor="projectId" required>
                   <Input
                     id="projectId"
+                    className={lightInputClass}
                     value={form.projectId}
                     onChange={event => updateField("projectId", event.target.value)}
                     placeholder="SV-PROJ-2401"
@@ -132,6 +137,7 @@ export function CertifySubmissionForm() {
                 <Field label="Team Member Name" htmlFor="teamMemberName" required>
                   <Input
                     id="teamMemberName"
+                    className={lightInputClass}
                     value={form.teamMemberName}
                     onChange={event => updateField("teamMemberName", event.target.value)}
                     placeholder="Hemanth Kumar"
@@ -142,6 +148,7 @@ export function CertifySubmissionForm() {
                 <Field label="Institution Name" htmlFor="institutionName" required>
                   <Input
                     id="institutionName"
+                    className={lightInputClass}
                     value={form.institutionName}
                     onChange={event => updateField("institutionName", event.target.value)}
                     placeholder="SNIST"
@@ -152,6 +159,7 @@ export function CertifySubmissionForm() {
                 <Field label="Project Start Date" htmlFor="projectStartDate" required>
                   <Input
                     id="projectStartDate"
+                    className={lightInputClass}
                     type="date"
                     value={form.projectStartDate}
                     onChange={event => updateField("projectStartDate", event.target.value)}
@@ -162,6 +170,7 @@ export function CertifySubmissionForm() {
                 <Field label="Project End Date" htmlFor="projectEndDate" required>
                   <Input
                     id="projectEndDate"
+                    className={lightInputClass}
                     type="date"
                     value={form.projectEndDate}
                     onChange={event => updateField("projectEndDate", event.target.value)}
@@ -172,6 +181,7 @@ export function CertifySubmissionForm() {
                 <Field label="Email" htmlFor="email" required>
                   <Input
                     id="email"
+                    className={lightInputClass}
                     type="email"
                     value={form.email}
                     onChange={event => updateField("email", event.target.value)}
@@ -183,6 +193,7 @@ export function CertifySubmissionForm() {
                 <Field label="Mobile Number" htmlFor="mobileNumber" required>
                   <Input
                     id="mobileNumber"
+                    className={lightInputClass}
                     value={form.mobileNumber}
                     onChange={event => updateField("mobileNumber", event.target.value)}
                     placeholder="+91 9876543210"
@@ -194,6 +205,7 @@ export function CertifySubmissionForm() {
               <Field label="Date of Birth" htmlFor="dob" required>
                 <Input
                   id="dob"
+                  className={lightInputClass}
                   type="date"
                   value={form.dob}
                   onChange={event => updateField("dob", event.target.value)}
