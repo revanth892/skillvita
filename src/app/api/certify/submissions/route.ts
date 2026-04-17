@@ -92,7 +92,8 @@ export async function POST(request: Request) {
 
     return NextResponse.json(
       {
-        message: "Submission received successfully.",
+        message:
+          "Submission has been made successfully. Your application will be reviewed and certificate will be updated accordingly.",
         submissionId: submission.id,
       },
       { status: 201 }

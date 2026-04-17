@@ -66,7 +66,10 @@ export function CertifySubmissionForm() {
 
       setForm(emptyForm);
       setFiles([]);
-      setMessage(result.message || "Submission received successfully.");
+      setMessage(
+        result.message ||
+          "Submission has been made successfully. Your application will be reviewed and certificate will be updated accordingly."
+      );
     } catch (submitError) {
       setError(
         submitError instanceof Error ? submitError.message : "Unable to submit right now."
