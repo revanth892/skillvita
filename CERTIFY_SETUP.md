@@ -20,7 +20,7 @@ SMTP_HOST=email-smtp.ap-south-1.amazonaws.com
 SMTP_PORT=587
 SMTP_USER=your_smtp_username
 SMTP_PASS=your_smtp_password
-CERTIFY_FROM_EMAIL=hemanth@skillvita.in
+CERTIFY_FROM_EMAIL=reachus@skillvita.in
 CERTIFY_FROM_NAME=SkillVita
 ```
 
@@ -81,3 +81,4 @@ If you later move to serverless or multiple instances, switch this feature to a 
 3. Admin signs in on `/certify/review` using Google.
 4. Admin approves a submission.
 5. SkillVita emails the certificate link to the learner.
+6. Admin can preview approved certificates and send custom emails from the review portal.

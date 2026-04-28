@@ -31,20 +31,59 @@ function getTransportConfig() {
   };
 }
 
+function getSender() {
+  return {
+    email: process.env.CERTIFY_FROM_EMAIL || "reachus@skillvita.in",
+    name: process.env.CERTIFY_FROM_NAME || "SkillVita",
+  };
+}
+
+function getTransporter() {
+  return nodemailer.createTransport(getTransportConfig());
+}
+
+export async function sendCertifyPortalEmail({
+  toEmail,
+  toName,
+  subject,
+  html,
+  text,
+}: {
+  toEmail: string;
+  toName?: string;
+  subject: string;
+  html: string;
+  text?: string;
+}) {
+  const sender = getSender();
+  const transporter = getTransporter();
+
+  await transporter.sendMail({
+    from: `${sender.name} <${sender.email}>`,
+    to: toName ? `${toName} <${toEmail}>` : toEmail,
+    subject,
+    html,
+    text,
+  });
+}
+
 export async function sendCertificateApprovalEmail(submission: CertifySubmission) {
   if (!submission.certificate) {
     throw new Error("Certificate data missing");
   }
 
   const certificateUrl = `${getAppUrl()}/certify/certificate/${submission.certificate.code}`;
-  const senderEmail = process.env.CERTIFY_FROM_EMAIL || "hemanth@skillvita.in";
-  const senderName = process.env.CERTIFY_FROM_NAME || "SkillVita";
-  const transporter = nodemailer.createTransport(getTransportConfig());
 
-  await transporter.sendMail({
-    from: `${senderName} <${senderEmail}>`,
-    to: `${submission.teamMemberName} <${submission.email}>`,
+  await sendCertifyPortalEmail({
+    toEmail: submission.email,
+    toName: submission.teamMemberName,
     subject: `Your SkillVita certificate is ready for ${submission.projectName}`,
+    text: `Hi ${submission.teamMemberName},
+
+Your submission for ${submission.projectName} has been reviewed and approved by SkillVita.
+
+Certificate ID: ${submission.certificate.code}
+Certificate link: ${certificateUrl}`,
     html: `
         <div style="font-family: Arial, sans-serif; max-width: 680px; margin: 0 auto; color: #0f172a;">
           <div style="background: linear-gradient(135deg, #014051, #0c1f2d); color: white; padding: 32px; border-radius: 20px 20px 0 0;">

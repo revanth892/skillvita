@@ -27,6 +27,11 @@ export function CertifyReviewDashboard({
   const [busyId, setBusyId] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [expandedCertificateId, setExpandedCertificateId] = useState<string | null>(null);
+  const [expandedEmailId, setExpandedEmailId] = useState<string | null>(null);
+  const [emailDrafts, setEmailDrafts] = useState<Record<string, { subject: string; message: string }>>(
+    {}
+  );
 
   const handleApprove = async (submissionId: string) => {
     setBusyId(submissionId);
@@ -62,6 +67,50 @@ export function CertifyReviewDashboard({
           ? approveError.message
           : "Unable to approve this submission."
       );
+    } finally {
+      setBusyId(null);
+    }
+  };
+
+  const updateEmailDraft = (submissionId: string, key: "subject" | "message", value: string) => {
+    setEmailDrafts(current => ({
+      ...current,
+      [submissionId]: {
+        subject: current[submissionId]?.subject || "",
+        message: current[submissionId]?.message || "",
+        [key]: value,
+      },
+    }));
+  };
+
+  const handleSendEmail = async (submission: CertifySubmission) => {
+    const draft = emailDrafts[submission.id] || { subject: "", message: "" };
+    setBusyId(submission.id);
+    setMessage(null);
+    setError(null);
+
+    try {
+      const response = await fetch(`/api/admin/certify/submissions/${submission.id}/email`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(draft),
+      });
+
+      const result = (await response.json()) as { error?: string };
+      if (!response.ok) {
+        throw new Error(result.error || "Unable to send this email.");
+      }
+
+      setMessage(`Email sent to ${submission.email} from reachus@skillvita.in.`);
+      setExpandedEmailId(null);
+      setEmailDrafts(current => ({
+        ...current,
+        [submission.id]: { subject: "", message: "" },
+      }));
+    } catch (emailError) {
+      setError(emailError instanceof Error ? emailError.message : "Unable to send this email.");
     } finally {
       setBusyId(null);
     }
@@ -148,15 +197,30 @@ export function CertifyReviewDashboard({
                   ) : null}
 
                   {submission.certificate ? (
-                    <a
-                      href={`/certify/certificate/${submission.certificate.code}`}
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setExpandedCertificateId(current =>
+                          current === submission.id ? null : submission.id
+                        )
+                      }
                       className="inline-flex h-9 items-center rounded-full border border-gray-200 px-4 text-sm font-medium text-gray-700 transition hover:bg-gray-50"
-                      target="_blank"
-                      rel="noreferrer"
                     >
-                      Open certificate
-                    </a>
+                      {expandedCertificateId === submission.id
+                        ? "Hide certificate preview"
+                        : "View certificate"}
+                    </button>
                   ) : null}
+
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setExpandedEmailId(current => (current === submission.id ? null : submission.id))
+                    }
+                    className="inline-flex h-9 items-center rounded-full border border-gray-200 px-4 text-sm font-medium text-gray-700 transition hover:bg-gray-50"
+                  >
+                    {expandedEmailId === submission.id ? "Close email" : "Send email"}
+                  </button>
                 </div>
               </div>
 
@@ -217,6 +281,105 @@ export function CertifyReviewDashboard({
                   </div>
                 </section>
               </div>
+
+              {submission.certificate && expandedCertificateId === submission.id ? (
+                <section className="mt-6 rounded-[28px] border border-gray-200 bg-white p-4 shadow-[0_8px_24px_rgba(15,23,42,0.05)]">
+                  <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+                    <div>
+                      <h3 className="text-sm font-semibold uppercase tracking-[0.18em] text-[#014051]">
+                        Certificate Preview
+                      </h3>
+                      <p className="mt-2 text-sm text-gray-600">
+                        Code {submission.certificate.code} · issued on{" "}
+                        {formatDate(submission.certificate.issuedAt)}
+                      </p>
+                    </div>
+                    <a
+                      href={`/certify/certificate/${submission.certificate.code}`}
+                      className="inline-flex h-9 items-center rounded-full border border-gray-200 px-4 text-sm font-medium text-gray-700 transition hover:bg-gray-50"
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      Open full certificate
+                    </a>
+                  </div>
+                  <div className="overflow-hidden rounded-2xl border border-gray-200 bg-gray-50">
+                    <iframe
+                      title={`Certificate preview for ${submission.teamMemberName}`}
+                      src={`/certify/certificate/${submission.certificate.code}`}
+                      className="h-[780px] w-full bg-white"
+                    />
+                  </div>
+                </section>
+              ) : null}
+
+              {expandedEmailId === submission.id ? (
+                <section className="mt-6 rounded-[28px] border border-gray-200 bg-gray-50 p-5">
+                  <div>
+                    <h3 className="text-sm font-semibold uppercase tracking-[0.18em] text-[#014051]">
+                      Send Email
+                    </h3>
+                    <p className="mt-2 text-sm text-gray-600">
+                      This sends through AWS SES using <strong>reachus@skillvita.in</strong>.
+                    </p>
+                  </div>
+
+                  <div className="mt-4 grid gap-4">
+                    <div className="grid gap-2">
+                      <label
+                        htmlFor={`subject-${submission.id}`}
+                        className="text-sm font-medium text-gray-800"
+                      >
+                        Subject
+                      </label>
+                      <input
+                        id={`subject-${submission.id}`}
+                        value={emailDrafts[submission.id]?.subject || ""}
+                        onChange={event =>
+                          updateEmailDraft(submission.id, "subject", event.target.value)
+                        }
+                        className="h-11 rounded-xl border border-gray-200 bg-white px-4 text-sm text-gray-900 outline-none transition focus:border-[#014051] focus:ring-4 focus:ring-[#014051]/10"
+                        placeholder="Your SkillVita certificate is ready"
+                      />
+                    </div>
+
+                    <div className="grid gap-2">
+                      <label
+                        htmlFor={`message-${submission.id}`}
+                        className="text-sm font-medium text-gray-800"
+                      >
+                        Message
+                      </label>
+                      <textarea
+                        id={`message-${submission.id}`}
+                        value={emailDrafts[submission.id]?.message || ""}
+                        onChange={event =>
+                          updateEmailDraft(submission.id, "message", event.target.value)
+                        }
+                        className="min-h-36 rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-900 outline-none transition focus:border-[#014051] focus:ring-4 focus:ring-[#014051]/10"
+                        placeholder={`Hi ${submission.teamMemberName},\n\nYour certificate is now available.`}
+                      />
+                    </div>
+
+                    <div className="flex flex-wrap gap-3">
+                      <Button
+                        onClick={() => handleSendEmail(submission)}
+                        disabled={busyId === submission.id}
+                        className="rounded-full bg-[#014051] px-5 text-white hover:bg-[#022e39]"
+                      >
+                        {busyId === submission.id ? "Sending..." : "Send email"}
+                      </Button>
+                      <button
+                        type="button"
+                        onClick={() => setExpandedEmailId(null)}
+                        className="inline-flex h-10 items-center rounded-full border border-gray-200 bg-white px-4 text-sm font-medium text-gray-700 transition hover:bg-gray-50"
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  </div>
+                </section>
+              ) : null}
             </article>
           ))
         )}
