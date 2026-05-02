@@ -86,6 +86,20 @@ export function CertificateSheet({
             </dl>
           </div>
         </div>
+
+        <div className="flex justify-end">
+          <div className="min-w-[240px] rounded-[28px] border border-[#014051]/10 bg-[#f7fbfc] px-6 py-5 text-center">
+            <img
+              src="/images/certify/sign_HG.jpg"
+              alt="Signature of Hemanth Guthala"
+              className="mx-auto h-20 w-auto object-contain"
+            />
+            <div className="mt-3 border-t border-dashed border-[#014051]/20 pt-3">
+              <p className="text-base font-semibold text-gray-900">Hemanth Guthala</p>
+              <p className="mt-1 text-sm font-medium text-[#014051]">Technical Lead, SkillVita</p>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
