@@ -47,7 +47,27 @@ export default function SampleCertificatePage() {
         email={sampleCertificate.email}
         mobileNumber={sampleCertificate.mobileNumber}
         reviewerEmail={sampleCertificate.reviewerEmail}
+        variant="public"
       />
+
+      <div className="pointer-events-none absolute left-[-99999px] top-0">
+        <CertificateSheet
+          teamMemberName={sampleCertificate.teamMemberName}
+          projectName={sampleCertificate.projectName}
+          institutionName={sampleCertificate.institutionName}
+          projectId={sampleCertificate.projectId}
+          projectStartDate={sampleCertificate.projectStartDate}
+          projectEndDate={sampleCertificate.projectEndDate}
+          issuedAt={sampleCertificate.issuedAt}
+          proofText={sampleCertificate.proofText}
+          certificateCode={sampleCertificate.certificateCode}
+          email={sampleCertificate.email}
+          mobileNumber={sampleCertificate.mobileNumber}
+          reviewerEmail={sampleCertificate.reviewerEmail}
+          containerId="certificate-pdf-sheet"
+          variant="pdf"
+        />
+      </div>
     </section>
   );
 }

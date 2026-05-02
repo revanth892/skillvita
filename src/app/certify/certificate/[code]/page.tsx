@@ -1,9 +1,7 @@
 import { notFound } from "next/navigation";
 
 import { CertificateActions } from "@/components/certify/CertificateActions";
-import {
-  CertificateSheet,
-} from "@/components/certify/CertificateSheet";
+import { CertificateSheet } from "@/components/certify/CertificateSheet";
 import { PrintCertificateButton } from "@/components/certify/PrintCertificateButton";
 import { getCertifySubmissionByCertificateCode } from "@/lib/certify-store";
 
@@ -42,7 +40,27 @@ export default async function CertificatePage({
         email={submission.email}
         mobileNumber={submission.mobileNumber}
         reviewerEmail={submission.certificate.reviewerEmail}
+        variant="public"
       />
+
+      <div className="pointer-events-none absolute left-[-99999px] top-0">
+        <CertificateSheet
+          teamMemberName={submission.teamMemberName}
+          projectName={submission.projectName}
+          institutionName={submission.institutionName}
+          projectId={submission.projectId}
+          projectStartDate={submission.projectStartDate}
+          projectEndDate={submission.projectEndDate}
+          issuedAt={submission.certificate.issuedAt}
+          proofText={submission.proofText}
+          certificateCode={submission.certificate.code}
+          email={submission.email}
+          mobileNumber={submission.mobileNumber}
+          reviewerEmail={submission.certificate.reviewerEmail}
+          containerId="certificate-pdf-sheet"
+          variant="pdf"
+        />
+      </div>
     </section>
   );
 }

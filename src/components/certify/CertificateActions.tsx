@@ -35,9 +35,9 @@ export function CertificateActions({
     setIsDownloading(true);
 
     try {
-      const certificateElement = document.getElementById("certificate-sheet");
+      const certificateElement = document.getElementById("certificate-pdf-sheet");
       if (!certificateElement) {
-        throw new Error("Certificate content not found.");
+        throw new Error("Certificate PDF content not found.");
       }
 
       const canvas = await html2canvas(certificateElement, {
