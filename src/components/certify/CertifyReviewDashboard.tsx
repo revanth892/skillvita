@@ -116,6 +116,17 @@ export function CertifyReviewDashboard({
     }
   };
 
+  const handleCopyPublicLink = async (certificateCode: string) => {
+    try {
+      const absoluteUrl = `${window.location.origin}/certify/certificate/${certificateCode}`;
+      await navigator.clipboard.writeText(absoluteUrl);
+      setMessage("Certificate public link copied.");
+      setError(null);
+    } catch {
+      setError("Unable to copy the certificate public link.");
+    }
+  };
+
   const handleLogout = async () => {
     await fetch("/api/admin/session", { method: "DELETE" });
     window.location.reload();
@@ -294,14 +305,23 @@ export function CertifyReviewDashboard({
                         {formatDate(submission.certificate.issuedAt)}
                       </p>
                     </div>
-                    <a
-                      href={`/certify/certificate/${submission.certificate.code}`}
-                      className="inline-flex h-9 items-center rounded-full border border-gray-200 px-4 text-sm font-medium text-gray-700 transition hover:bg-gray-50"
-                      target="_blank"
-                      rel="noreferrer"
-                    >
-                      Open full certificate
-                    </a>
+                    <div className="flex flex-wrap gap-3">
+                      <a
+                        href={`/certify/certificate/${submission.certificate.code}`}
+                        className="inline-flex h-9 items-center rounded-full border border-gray-200 px-4 text-sm font-medium text-gray-700 transition hover:bg-gray-50"
+                        target="_blank"
+                        rel="noreferrer"
+                      >
+                        Open full certificate
+                      </a>
+                      <button
+                        type="button"
+                        onClick={() => handleCopyPublicLink(submission.certificate!.code)}
+                        className="inline-flex h-9 items-center rounded-full border border-gray-200 px-4 text-sm font-medium text-gray-700 transition hover:bg-gray-50"
+                      >
+                        Copy public link
+                      </button>
+                    </div>
                   </div>
                   <div className="overflow-hidden rounded-2xl border border-gray-200 bg-gray-50">
                     <iframe

@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 
+import { CertificateActions } from "@/components/certify/CertificateActions";
 import { PrintCertificateButton } from "@/components/certify/PrintCertificateButton";
 import { getCertifySubmissionByCertificateCode } from "@/lib/certify-store";
 
@@ -25,11 +26,18 @@ export default async function CertificatePage({
 
   return (
     <section className="mx-auto w-full max-w-6xl px-4 py-10 md:px-6 md:py-14">
-      <div className="mb-6 flex items-center justify-end print:hidden">
+      <div className="mb-6 flex flex-col gap-3 print:hidden md:flex-row md:items-center md:justify-end">
         <PrintCertificateButton />
+        <CertificateActions
+          certificateCode={submission.certificate.code}
+          projectName={submission.projectName}
+        />
       </div>
 
-      <div className="overflow-hidden rounded-[36px] border border-[#014051]/10 bg-white shadow-[0_30px_90px_rgba(1,64,81,0.18)]">
+      <div
+        id="certificate-sheet"
+        className="overflow-hidden rounded-[36px] border border-[#014051]/10 bg-white shadow-[0_30px_90px_rgba(1,64,81,0.18)]"
+      >
         <div className="bg-[radial-gradient(circle_at_top_left,_rgba(50,254,107,0.20),_transparent_32%),linear-gradient(135deg,#0b2530_0%,#014051_45%,#0b2530_100%)] px-8 py-14 text-white md:px-14">
           <p className="text-sm font-semibold uppercase tracking-[0.28em] text-accent-500">
             SkillVita Certificate of Project Completion
