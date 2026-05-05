@@ -24,6 +24,13 @@ export default async function CertificatePage({
         <CertificateActions
           certificateCode={submission.certificate.code}
           projectName={submission.projectName}
+          teamMemberName={submission.teamMemberName}
+          institutionName={submission.institutionName}
+          projectId={submission.projectId}
+          projectStartDate={submission.projectStartDate}
+          projectEndDate={submission.projectEndDate}
+          issuedAt={submission.certificate.issuedAt}
+          reviewerEmail={submission.certificate.reviewerEmail}
         />
       </div>
 
@@ -42,25 +49,6 @@ export default async function CertificatePage({
         reviewerEmail={submission.certificate.reviewerEmail}
         variant="public"
       />
-
-      <div className="pointer-events-none absolute left-[-99999px] top-0">
-        <CertificateSheet
-          teamMemberName={submission.teamMemberName}
-          projectName={submission.projectName}
-          institutionName={submission.institutionName}
-          projectId={submission.projectId}
-          projectStartDate={submission.projectStartDate}
-          projectEndDate={submission.projectEndDate}
-          issuedAt={submission.certificate.issuedAt}
-          proofText={submission.proofText}
-          certificateCode={submission.certificate.code}
-          email={submission.email}
-          mobileNumber={submission.mobileNumber}
-          reviewerEmail={submission.certificate.reviewerEmail}
-          containerId="certificate-pdf-sheet"
-          variant="pdf"
-        />
-      </div>
     </section>
   );
 }
