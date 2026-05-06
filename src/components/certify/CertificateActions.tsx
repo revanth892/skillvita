@@ -83,115 +83,168 @@ export function CertificateActions({
     setIsDownloading(true);
 
     try {
-      const [logoDataUrl, signatureDataUrl] = await Promise.all([
+      const [logoDataUrl, iconDataUrl, signatureDataUrl] = await Promise.all([
         loadImageDataUrl("/skillvita.svg"),
+        loadImageDataUrl("/skillvita_icon.svg"),
         loadImageDataUrl("/images/certify/sign_HG.jpg"),
       ]);
 
       const pdf = new jsPDF({
-        orientation: "portrait",
+        orientation: "landscape",
         unit: "pt",
         format: "a4",
       });
 
       const pageWidth = pdf.internal.pageSize.getWidth();
       const pageHeight = pdf.internal.pageSize.getHeight();
+      const patternX = pageWidth - 124;
+      const contentLeft = 56;
+      const contentRight = patternX - 44;
 
-      pdf.setFillColor(255, 250, 244);
+      const drawRightPattern = () => {
+        pdf.setFillColor(248, 250, 252);
+        pdf.rect(patternX, 0, 124, pageHeight, "F");
+
+        const cols = 2;
+        const iconW = 38;
+        const iconH = 38;
+        const xGap = 18;
+        const yGap = 12;
+        let accentIndex = 0;
+
+        for (let row = 0; row < 9; row += 1) {
+          for (let col = 0; col < cols; col += 1) {
+            const x = patternX + 14 + col * (iconW + xGap);
+            const y = 18 + row * (iconH + yGap);
+            pdf.addImage(iconDataUrl, "PNG", x, y, iconW, iconH);
+
+            if ((row + col) % 4 === 2) {
+              const accentY = y + 8 + (accentIndex % 2) * 2;
+              pdf.setFillColor(255, 193, 173);
+              pdf.roundedRect(x + 23, accentY, 12, 22, 6, 6, "F");
+              accentIndex += 1;
+            }
+          }
+        }
+      };
+
+      const drawSignatureBlock = () => {
+        const blockWidth = 180;
+        const blockX = contentLeft + 4;
+        const baseY = pageHeight - 132;
+
+        pdf.addImage(signatureDataUrl, "PNG", blockX + 8, baseY - 32, 90, 30);
+        pdf.setDrawColor(180, 185, 194);
+        pdf.setLineWidth(1);
+        pdf.line(blockX, baseY, blockX + blockWidth, baseY);
+
+        pdf.setTextColor(15, 23, 42);
+        pdf.setFont("helvetica", "bold");
+        pdf.setFontSize(15);
+        pdf.text("Hemanth Guthala", blockX + blockWidth / 2, baseY + 22, { align: "center" });
+
+        pdf.setFont("helvetica", "normal");
+        pdf.setFontSize(11);
+        pdf.setTextColor(71, 85, 105);
+        pdf.text("Technical Lead, SkillVita", blockX + blockWidth / 2, baseY + 40, {
+          align: "center",
+        });
+      };
+
+      const drawVerificationBlock = () => {
+        const blockWidth = 208;
+        const blockX = contentRight - blockWidth;
+        const baseY = pageHeight - 136;
+
+        pdf.setDrawColor(180, 185, 194);
+        pdf.setLineWidth(1);
+        pdf.line(blockX, baseY, blockX + blockWidth, baseY);
+
+        pdf.setFont("helvetica", "bold");
+        pdf.setFontSize(14);
+        pdf.setTextColor(15, 23, 42);
+        pdf.text("Verified by SkillVita", blockX + blockWidth / 2, baseY + 22, {
+          align: "center",
+        });
+
+        pdf.setFont("helvetica", "normal");
+        pdf.setFontSize(11);
+        pdf.setTextColor(71, 85, 105);
+        pdf.text(reviewerEmail, blockX + blockWidth / 2, baseY + 40, { align: "center" });
+
+        pdf.setFontSize(10);
+        pdf.text(`Certificate Code: ${certificateCode}`, blockX + blockWidth / 2, baseY + 58, {
+          align: "center",
+        });
+      };
+
+      pdf.setFillColor(255, 255, 255);
       pdf.rect(0, 0, pageWidth, pageHeight, "F");
+      drawRightPattern();
 
-      pdf.setDrawColor(242, 216, 202);
-      pdf.setLineWidth(28);
-      pdf.circle(pageWidth - 35, 120, 150, "S");
-      pdf.setDrawColor(247, 232, 223);
-      pdf.setLineWidth(14);
-      pdf.circle(pageWidth - 20, 140, 125, "S");
+      pdf.setDrawColor(236, 239, 244);
+      pdf.setLineWidth(1);
+      pdf.roundedRect(18, 18, pageWidth - 36, pageHeight - 36, 14, 14, "S");
 
-      pdf.setFillColor(242, 154, 97);
-      pdf.ellipse(95, pageHeight - 55, 235, 95, "F");
-      pdf.setFillColor(217, 111, 54);
-      pdf.ellipse(170, pageHeight - 20, 320, 120, "F");
-
-      pdf.setFillColor(18, 18, 18);
-      pdf.roundedRect(pageWidth / 2 - 48, 40, 96, 44, 18, 18, "F");
-      pdf.addImage(logoDataUrl, "PNG", pageWidth / 2 - 34, 50, 68, 22);
+      pdf.addImage(logoDataUrl, "PNG", contentLeft, 40, 176, 42);
 
       pdf.setTextColor(23, 23, 23);
       pdf.setFont("helvetica", "bold");
-      pdf.setFontSize(30);
-      pdf.text("CERTIFICATE", pageWidth / 2, 155, { align: "center" });
+      pdf.setFontSize(34);
+      pdf.text("CERTIFICATE", contentLeft, 144);
+
+      pdf.setFontSize(20);
+      pdf.text("OF PARTICIPATION", contentLeft, 172);
 
       pdf.setFont("helvetica", "normal");
-      pdf.setFontSize(22);
-      pdf.text(teamMemberName, pageWidth / 2, 212, { align: "center" });
-
-      pdf.setFontSize(14);
-      pdf.setTextColor(72, 72, 72);
-      pdf.text("has successfully completed", pageWidth / 2, 248, { align: "center" });
+      pdf.setFontSize(15);
+      pdf.setTextColor(55, 65, 81);
+      pdf.text("This is to certify that", contentLeft + 8, 220);
 
       pdf.setFont("helvetica", "bold");
-      pdf.setFontSize(17);
-      pdf.setTextColor(217, 111, 54);
-      pdf.text(projectName.toUpperCase(), pageWidth / 2, 278, { align: "center", maxWidth: 330 });
-
-      pdf.setFont("helvetica", "normal");
-      pdf.setFontSize(13);
-      pdf.setTextColor(86, 86, 86);
-      pdf.text("under SkillVita review and project verification", pageWidth / 2, 306, {
-        align: "center",
+      pdf.setFontSize(26);
+      pdf.setTextColor(95, 68, 255);
+      pdf.text(teamMemberName.toUpperCase(), contentLeft + 8, 266, {
+        maxWidth: contentRight - contentLeft - 16,
       });
 
-      pdf.setTextColor(255, 255, 255);
-      pdf.setFont("helvetica", "bold");
-      pdf.setFontSize(11);
-      pdf.text(formatCertificateDate(issuedAt), 48, pageHeight - 92);
+      pdf.setDrawColor(160, 168, 180);
+      pdf.setLineWidth(1.2);
+      pdf.line(contentLeft + 8, 280, contentRight - 8, 280);
 
-      pdf.setFont("helvetica", "normal");
-      pdf.setFontSize(11);
-      pdf.text(institutionName, 48, pageHeight - 72);
+      pdf.setTextColor(31, 41, 55);
       pdf.setFont("helvetica", "bold");
-      pdf.text(projectName, 48, pageHeight - 54);
-      pdf.setFont("helvetica", "normal");
-      pdf.text(projectId, 48, pageHeight - 36);
-
-      pdf.setFont("helvetica", "bold");
-      pdf.setFontSize(10);
-      pdf.setTextColor(255, 237, 226);
-      pdf.text("REVIEWED BY", pageWidth / 2, pageHeight - 92, { align: "center" });
       pdf.setFontSize(14);
-      pdf.setTextColor(255, 255, 255);
-      pdf.text("SkillVita", pageWidth / 2, pageHeight - 70, { align: "center" });
+      pdf.text("has successfully completed", contentLeft + 8, 316);
       pdf.setFont("helvetica", "normal");
-      pdf.setFontSize(11);
-      pdf.text(reviewerEmail, pageWidth / 2, pageHeight - 50, { align: "center" });
-
-      const cardX = pageWidth - 192;
-      const cardY = pageHeight - 170;
-      pdf.setFillColor(23, 23, 23);
-      pdf.roundedRect(cardX, cardY, 150, 118, 18, 18, "F");
-      pdf.addImage(signatureDataUrl, "PNG", cardX + 28, cardY + 10, 92, 38);
-      pdf.setDrawColor(92, 92, 92);
-      pdf.line(cardX + 16, cardY + 60, cardX + 134, cardY + 60);
+      pdf.text("the", contentLeft + 172, 316);
       pdf.setFont("helvetica", "bold");
+      pdf.text(projectName, contentLeft + 196, 316, {
+        maxWidth: Math.max(180, contentRight - (contentLeft + 196) - 10),
+      });
+
+      const detailLines = pdf.splitTextToSize(
+        `conducted by SkillVita, held from ${formatCertificateDate(projectStartDate)} to ${formatCertificateDate(projectEndDate)}.`,
+        contentRight - contentLeft - 16
+      );
+      pdf.setFont("helvetica", "normal");
       pdf.setFontSize(13);
-      pdf.setTextColor(255, 255, 255);
-      pdf.text("Hemanth Guthala", cardX + 75, cardY + 80, { align: "center" });
+      pdf.setTextColor(55, 65, 81);
+      pdf.text(detailLines, contentLeft + 8, 346, { lineHeightFactor: 1.55 });
+
+      pdf.setFont("helvetica", "bold");
+      pdf.setFontSize(10);
+      pdf.setTextColor(71, 85, 105);
+      pdf.text(`Issued on ${formatCertificateDate(issuedAt)}`, contentLeft + 8, pageHeight - 86);
+
       pdf.setFont("helvetica", "normal");
       pdf.setFontSize(10);
-      pdf.setTextColor(248, 215, 195);
-      pdf.text("Technical Lead, SkillVita", cardX + 75, cardY + 96, { align: "center" });
-      pdf.setFontSize(8);
-      pdf.text(certificateCode, cardX + 75, cardY + 110, { align: "center" });
+      pdf.setTextColor(107, 114, 128);
+      pdf.text(`Institution: ${institutionName}`, contentLeft + 8, pageHeight - 68);
+      pdf.text(`Project ID: ${projectId}`, contentLeft + 8, pageHeight - 52);
 
-      pdf.setFont("helvetica", "bold");
-      pdf.setFontSize(8);
-      pdf.setTextColor(255, 245, 238);
-      pdf.text(
-        `${formatCertificateDate(projectStartDate)} - ${formatCertificateDate(projectEndDate)}`.toUpperCase(),
-        pageWidth - 44,
-        pageHeight - 16,
-        { align: "right" }
-      );
+      drawSignatureBlock();
+      drawVerificationBlock();
 
       const fileName = `${projectName}-${certificateCode}`
         .replace(/[^a-zA-Z0-9_-]+/g, "-")
