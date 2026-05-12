@@ -100,9 +100,14 @@ function PublicCertificateSheet({
     >
       <div className="bg-[radial-gradient(circle_at_top_left,_rgba(50,254,107,0.20),_transparent_32%),linear-gradient(135deg,#0b2530_0%,#014051_45%,#0b2530_100%)] px-8 py-14 text-white md:px-14">
         <div className="flex items-center justify-between gap-6">
-          <p className="text-sm font-semibold uppercase tracking-[0.28em] text-accent-500">
-            SkillVita Certificate of Project Completion
-          </p>
+          <div>
+            <p className="text-sm font-semibold uppercase tracking-[0.28em] text-accent-500">
+              SkillVita Certificate of Skill
+            </p>
+            <p className="mt-3 inline-flex rounded-full border border-white/15 bg-white/10 px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-white/90">
+              Skill Badge: Verified Project Completion
+            </p>
+          </div>
           <img
             src="/skillvita.svg"
             alt="SkillVita logo"
@@ -113,7 +118,7 @@ function PublicCertificateSheet({
           {teamMemberName}
         </h1>
         <p className="mt-6 max-w-3xl text-lg leading-8 text-gray-200">
-          is hereby recognized by SkillVita for the successful completion and review of{" "}
+          has completed the project{" "}
           <span className="font-semibold text-white">{projectName}</span>.
         </p>
       </div>

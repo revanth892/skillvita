@@ -96,9 +96,9 @@ export function CertificateActions({
 
       const pageWidth = pdf.internal.pageSize.getWidth();
       const pageHeight = pdf.internal.pageSize.getHeight();
-      const patternX = pageWidth - 124;
+      const patternX = pageWidth - 132;
       const contentLeft = 56;
-      const contentRight = patternX - 44;
+      const contentRight = patternX - 52;
       const contentWidth = contentRight - contentLeft;
 
       const drawRightPattern = () => {
@@ -157,11 +157,11 @@ export function CertificateActions({
       };
 
       const drawSignatureBlock = () => {
-        const blockWidth = 180;
+        const blockWidth = 208;
         const blockX = contentLeft + 4;
-        const baseY = pageHeight - 128;
+        const baseY = pageHeight - 124;
 
-        pdf.addImage(signatureDataUrl, "PNG", blockX + 8, baseY - 32, 90, 30);
+        pdf.addImage(signatureDataUrl, "PNG", blockX + 16, baseY - 34, 94, 32);
         pdf.setDrawColor(180, 185, 194);
         pdf.setLineWidth(1);
         pdf.line(blockX, baseY, blockX + blockWidth, baseY);
@@ -180,9 +180,9 @@ export function CertificateActions({
       };
 
       const drawVerificationBlock = () => {
-        const blockWidth = 208;
+        const blockWidth = 220;
         const blockX = contentRight - blockWidth;
-        const baseY = pageHeight - 128;
+        const baseY = pageHeight - 124;
 
         pdf.setDrawColor(180, 185, 194);
         pdf.setLineWidth(1);
@@ -218,41 +218,41 @@ export function CertificateActions({
 
       pdf.setTextColor(23, 23, 23);
       pdf.setFont("helvetica", "bold");
-      pdf.setFontSize(34);
-      pdf.text("CERTIFICATE", contentLeft, 144);
+      pdf.setFontSize(36);
+      pdf.text("CERTIFICATE", contentLeft, 146);
 
       pdf.setFontSize(20);
-      pdf.text("OF SKILL", contentLeft, 172);
+      pdf.text("OF SKILL", contentLeft, 176);
 
       pdf.setFont("helvetica", "normal");
       pdf.setFontSize(15);
       pdf.setTextColor(55, 65, 81);
-      pdf.text("This is to certify that", contentLeft + 8, 220);
+      pdf.text("This is to certify that", contentLeft + 8, 228);
 
       pdf.setFont("helvetica", "bold");
-      pdf.setFontSize(26);
+      pdf.setFontSize(28);
       pdf.setTextColor(95, 68, 255);
-      pdf.text(teamMemberName.toUpperCase(), contentLeft + 8, 266, {
+      pdf.text(teamMemberName.toUpperCase(), contentLeft + 8, 276, {
         maxWidth: contentRight - contentLeft - 16,
       });
 
       pdf.setDrawColor(160, 168, 180);
       pdf.setLineWidth(1.2);
-      pdf.line(contentLeft + 8, 280, contentRight - 8, 280);
+      pdf.line(contentLeft + 8, 292, contentRight - 8, 292);
 
       pdf.setTextColor(31, 41, 55);
       pdf.setFont("helvetica", "normal");
-      pdf.setFontSize(15);
+      pdf.setFontSize(16);
       const statementX = contentLeft + 8;
-      pdf.text("has completed the project -", statementX, 320);
+      pdf.text("has completed the project -", statementX, 330);
 
       pdf.setFont("helvetica", "bold");
-      pdf.setFontSize(20);
+      pdf.setFontSize(22);
       const projectLines = pdf.splitTextToSize(
         projectName,
-        Math.max(280, contentWidth - 32)
+        Math.max(280, contentWidth - 40)
       );
-      pdf.text(projectLines, statementX, 348, { lineHeightFactor: 1.25 });
+      pdf.text(projectLines, statementX, 362, { lineHeightFactor: 1.2 });
 
       const detailLines = pdf.splitTextToSize(
         `conducted by SkillVita, held from ${formatCertificateDate(projectStartDate)} to ${formatCertificateDate(projectEndDate)}.`,
@@ -261,13 +261,13 @@ export function CertificateActions({
       pdf.setFont("helvetica", "normal");
       pdf.setFontSize(13);
       pdf.setTextColor(55, 65, 81);
-      const detailStartY = 348 + projectLines.length * 26 + 14;
+      const detailStartY = 362 + projectLines.length * 24 + 16;
       pdf.text(detailLines, statementX, detailStartY, { lineHeightFactor: 1.55 });
 
       pdf.setFont("helvetica", "bold");
       pdf.setFontSize(10);
       pdf.setTextColor(71, 85, 105);
-      pdf.text(`Issued on ${formatCertificateDate(issuedAt)}`, contentLeft + 8, pageHeight - 86);
+      pdf.text(`Issued on ${formatCertificateDate(issuedAt)}`, contentLeft + 8, pageHeight - 88);
 
       pdf.setFont("helvetica", "normal");
       pdf.setFontSize(10);
