@@ -156,53 +156,57 @@ export function CertificateActions({
         }
       };
 
-      const drawSignatureBlock = () => {
-        const blockWidth = 208;
-        const blockX = contentLeft + 4;
-        const baseY = pageHeight - 124;
+      const drawVerificationStrip = () => {
+        const stripX = contentLeft + 4;
+        const stripY = pageHeight - 148;
+        const stripWidth = contentRight - contentLeft - 8;
+        const stripHeight = 108;
+        const signatureAreaWidth = 170;
+        const dividerX = stripX + signatureAreaWidth + 28;
 
-        pdf.addImage(signatureDataUrl, "PNG", blockX + 16, baseY - 34, 94, 32);
-        pdf.setDrawColor(180, 185, 194);
+        pdf.setFillColor(248, 250, 252);
+        pdf.roundedRect(stripX, stripY, stripWidth, stripHeight, 16, 16, "F");
+
+        pdf.setDrawColor(224, 229, 236);
         pdf.setLineWidth(1);
-        pdf.line(blockX, baseY, blockX + blockWidth, baseY);
+        pdf.roundedRect(stripX, stripY, stripWidth, stripHeight, 16, 16, "S");
 
-        pdf.setTextColor(15, 23, 42);
+        pdf.addImage(signatureDataUrl, "PNG", stripX + 18, stripY + 18, 100, 34);
+        pdf.setDrawColor(180, 185, 194);
+        pdf.line(stripX + 12, stripY + 58, stripX + signatureAreaWidth, stripY + 58);
+
         pdf.setFont("helvetica", "bold");
-        pdf.setFontSize(15);
-        pdf.text("Hemanth Guthala", blockX + blockWidth / 2, baseY + 22, { align: "center" });
-
+        pdf.setFontSize(13);
+        pdf.setTextColor(15, 23, 42);
+        pdf.text("Technical Lead, SkillVita", stripX + 14, stripY + 78);
         pdf.setFont("helvetica", "normal");
-        pdf.setFontSize(11);
+        pdf.setFontSize(10);
         pdf.setTextColor(71, 85, 105);
-        pdf.text("Technical Lead, SkillVita", blockX + blockWidth / 2, baseY + 40, {
-          align: "center",
-        });
-      };
+        pdf.text(reviewerEmail, stripX + 14, stripY + 96);
 
-      const drawVerificationBlock = () => {
-        const blockWidth = 220;
-        const blockX = contentRight - blockWidth;
-        const baseY = pageHeight - 124;
+        pdf.setDrawColor(224, 229, 236);
+        pdf.line(dividerX, stripY + 16, dividerX, stripY + stripHeight - 16);
 
-        pdf.setDrawColor(180, 185, 194);
-        pdf.setLineWidth(1);
-        pdf.line(blockX, baseY, blockX + blockWidth, baseY);
+        const metaLeft = dividerX + 18;
+        const metaRight = stripX + stripWidth - 18;
 
         pdf.setFont("helvetica", "bold");
         pdf.setFontSize(14);
         pdf.setTextColor(15, 23, 42);
-        pdf.text("Verified by SkillVita", blockX + blockWidth / 2, baseY + 22, {
-          align: "center",
-        });
+        pdf.text("Verified by SkillVita", metaLeft, stripY + 34);
 
         pdf.setFont("helvetica", "normal");
-        pdf.setFontSize(11);
-        pdf.setTextColor(71, 85, 105);
-        pdf.text(reviewerEmail, blockX + blockWidth / 2, baseY + 40, { align: "center" });
-
         pdf.setFontSize(10);
-        pdf.text(`Certificate Code: ${certificateCode}`, blockX + blockWidth / 2, baseY + 58, {
-          align: "center",
+        pdf.setTextColor(71, 85, 105);
+        pdf.text(`Issued on ${formatCertificateDate(issuedAt)}`, metaLeft, stripY + 56);
+        pdf.text(`Institution: ${institutionName}`, metaLeft, stripY + 74);
+        pdf.text(`Project ID: ${projectId}`, metaLeft, stripY + 92);
+
+        pdf.setFont("helvetica", "bold");
+        pdf.setFontSize(10);
+        pdf.setTextColor(51, 65, 85);
+        pdf.text(`Certificate Code: ${certificateCode}`, metaRight, stripY + 56, {
+          align: "right",
         });
       };
 
@@ -264,19 +268,7 @@ export function CertificateActions({
       const detailStartY = 362 + projectLines.length * 24 + 16;
       pdf.text(detailLines, statementX, detailStartY, { lineHeightFactor: 1.55 });
 
-      pdf.setFont("helvetica", "bold");
-      pdf.setFontSize(10);
-      pdf.setTextColor(71, 85, 105);
-      pdf.text(`Issued on ${formatCertificateDate(issuedAt)}`, contentLeft + 8, pageHeight - 88);
-
-      pdf.setFont("helvetica", "normal");
-      pdf.setFontSize(10);
-      pdf.setTextColor(107, 114, 128);
-      pdf.text(`Institution: ${institutionName}`, contentLeft + 8, pageHeight - 68);
-      pdf.text(`Project ID: ${projectId}`, contentLeft + 8, pageHeight - 52);
-
-      drawSignatureBlock();
-      drawVerificationBlock();
+      drawVerificationStrip();
 
       const fileName = `${projectName}-${certificateCode}`
         .replace(/[^a-zA-Z0-9_-]+/g, "-")
