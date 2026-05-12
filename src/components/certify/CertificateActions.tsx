@@ -258,15 +258,20 @@ export function CertificateActions({
       );
       pdf.text(projectLines, statementX, 362, { lineHeightFactor: 1.2 });
 
-      const detailLines = pdf.splitTextToSize(
-        `conducted by SkillVita, held from ${formatCertificateDate(projectStartDate)} to ${formatCertificateDate(projectEndDate)}.`,
-        contentRight - contentLeft - 16
-      );
       pdf.setFont("helvetica", "normal");
       pdf.setFontSize(13);
       pdf.setTextColor(55, 65, 81);
       const detailStartY = 362 + projectLines.length * 24 + 16;
-      pdf.text(detailLines, statementX, detailStartY, { lineHeightFactor: 1.55 });
+      pdf.text("conducted by SkillVita", statementX, detailStartY);
+
+      pdf.setFont("helvetica", "bold");
+      pdf.setFontSize(12);
+      pdf.setTextColor(71, 85, 105);
+      pdf.text(
+        `${formatCertificateDate(projectStartDate)} - ${formatCertificateDate(projectEndDate)}`,
+        statementX,
+        detailStartY + 22
+      );
 
       drawVerificationStrip();
 
