@@ -222,7 +222,7 @@ export function CertificateActions({
       pdf.text("CERTIFICATE", contentLeft, 144);
 
       pdf.setFontSize(20);
-      pdf.text("OF PARTICIPATION", contentLeft, 172);
+      pdf.text("OF SKILL", contentLeft, 172);
 
       pdf.setFont("helvetica", "normal");
       pdf.setFontSize(15);
