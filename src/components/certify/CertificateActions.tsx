@@ -83,9 +83,8 @@ export function CertificateActions({
     setIsDownloading(true);
 
     try {
-      const [logoDataUrl, iconDataUrl, signatureDataUrl] = await Promise.all([
+      const [logoDataUrl, signatureDataUrl] = await Promise.all([
         loadImageDataUrl("/skillvita.svg"),
-        loadImageDataUrl("/skillvita_icon.svg"),
         loadImageDataUrl("/images/certify/sign_HG.jpg"),
       ]);
 
@@ -100,29 +99,58 @@ export function CertificateActions({
       const patternX = pageWidth - 124;
       const contentLeft = 56;
       const contentRight = patternX - 44;
+      const contentWidth = contentRight - contentLeft;
 
       const drawRightPattern = () => {
-        pdf.setFillColor(248, 250, 252);
+        pdf.setFillColor(245, 247, 250);
         pdf.rect(patternX, 0, 124, pageHeight, "F");
 
-        const cols = 2;
-        const iconW = 38;
-        const iconH = 38;
-        const xGap = 18;
-        const yGap = 12;
-        let accentIndex = 0;
+        const cols = 3;
+        const tileW = 24;
+        const tileH = 34;
+        const xGap = 10;
+        const yGap = 10;
+        const startX = patternX + 14;
+        const darkGrey = [37, 43, 56] as const;
+        const green = [50, 254, 107] as const;
+        const muted = [198, 205, 214] as const;
 
-        for (let row = 0; row < 9; row += 1) {
+        const drawTile = (x: number, y: number, stroke: readonly number[], fill?: readonly number[]) => {
+          if (fill) {
+            pdf.setFillColor(fill[0], fill[1], fill[2]);
+          }
+          pdf.setDrawColor(stroke[0], stroke[1], stroke[2]);
+          pdf.setLineWidth(1.4);
+          pdf.lines(
+            [
+              [8, -8],
+              [12, 0],
+              [0, 20],
+              [-8, 8],
+              [-12, 0],
+              [0, -20],
+            ],
+            x,
+            y + 10,
+            [1, 1],
+            fill ? "FD" : "S",
+            true
+          );
+        };
+
+        for (let row = 0; row < 11; row += 1) {
           for (let col = 0; col < cols; col += 1) {
-            const x = patternX + 14 + col * (iconW + xGap);
-            const y = 18 + row * (iconH + yGap);
-            pdf.addImage(iconDataUrl, "PNG", x, y, iconW, iconH);
+            const x = startX + col * (tileW + xGap);
+            const y = 16 + row * (tileH + yGap);
+            const isAccent = (row + col) % 5 === 1;
+            const isFilled = (row + col) % 2 === 0;
 
-            if ((row + col) % 4 === 2) {
-              const accentY = y + 8 + (accentIndex % 2) * 2;
-              pdf.setFillColor(255, 193, 173);
-              pdf.roundedRect(x + 23, accentY, 12, 22, 6, 6, "F");
-              accentIndex += 1;
+            if (isAccent) {
+              drawTile(x, y, darkGrey, green);
+            } else if (isFilled) {
+              drawTile(x, y, muted, [226, 232, 240]);
+            } else {
+              drawTile(x, y, darkGrey);
             }
           }
         }
@@ -213,14 +241,18 @@ export function CertificateActions({
       pdf.line(contentLeft + 8, 280, contentRight - 8, 280);
 
       pdf.setTextColor(31, 41, 55);
-      pdf.setFont("helvetica", "bold");
-      pdf.setFontSize(14);
-      pdf.text("has successfully completed", contentLeft + 8, 316);
       pdf.setFont("helvetica", "normal");
-      pdf.text("the", contentLeft + 172, 316);
+      pdf.setFontSize(15);
+      const projectLineY = 322;
+      const startX = contentLeft + 8;
+      const normalPrefix = '" has completed the project - ';
+      const prefixWidth = pdf.getTextWidth(normalPrefix);
+      const projectMaxWidth = contentWidth - 24 - prefixWidth;
+
+      pdf.text(normalPrefix, startX, projectLineY);
       pdf.setFont("helvetica", "bold");
-      pdf.text(projectName, contentLeft + 196, 316, {
-        maxWidth: Math.max(180, contentRight - (contentLeft + 196) - 10),
+      pdf.text(projectName, startX + prefixWidth, projectLineY, {
+        maxWidth: Math.max(220, projectMaxWidth),
       });
 
       const detailLines = pdf.splitTextToSize(
@@ -230,7 +262,7 @@ export function CertificateActions({
       pdf.setFont("helvetica", "normal");
       pdf.setFontSize(13);
       pdf.setTextColor(55, 65, 81);
-      pdf.text(detailLines, contentLeft + 8, 346, { lineHeightFactor: 1.55 });
+      pdf.text(detailLines, contentLeft + 8, 358, { lineHeightFactor: 1.55 });
 
       pdf.setFont("helvetica", "bold");
       pdf.setFontSize(10);
