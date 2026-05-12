@@ -159,7 +159,7 @@ export function CertificateActions({
       const drawSignatureBlock = () => {
         const blockWidth = 180;
         const blockX = contentLeft + 4;
-        const baseY = pageHeight - 132;
+        const baseY = pageHeight - 128;
 
         pdf.addImage(signatureDataUrl, "PNG", blockX + 8, baseY - 32, 90, 30);
         pdf.setDrawColor(180, 185, 194);
@@ -182,7 +182,7 @@ export function CertificateActions({
       const drawVerificationBlock = () => {
         const blockWidth = 208;
         const blockX = contentRight - blockWidth;
-        const baseY = pageHeight - 136;
+        const baseY = pageHeight - 128;
 
         pdf.setDrawColor(180, 185, 194);
         pdf.setLineWidth(1);
@@ -243,17 +243,16 @@ export function CertificateActions({
       pdf.setTextColor(31, 41, 55);
       pdf.setFont("helvetica", "normal");
       pdf.setFontSize(15);
-      const projectLineY = 322;
-      const startX = contentLeft + 8;
-      const normalPrefix = '" has completed the project - ';
-      const prefixWidth = pdf.getTextWidth(normalPrefix);
-      const projectMaxWidth = contentWidth - 24 - prefixWidth;
+      const statementX = contentLeft + 8;
+      pdf.text("has completed the project -", statementX, 320);
 
-      pdf.text(normalPrefix, startX, projectLineY);
       pdf.setFont("helvetica", "bold");
-      pdf.text(projectName, startX + prefixWidth, projectLineY, {
-        maxWidth: Math.max(220, projectMaxWidth),
-      });
+      pdf.setFontSize(20);
+      const projectLines = pdf.splitTextToSize(
+        projectName,
+        Math.max(280, contentWidth - 32)
+      );
+      pdf.text(projectLines, statementX, 348, { lineHeightFactor: 1.25 });
 
       const detailLines = pdf.splitTextToSize(
         `conducted by SkillVita, held from ${formatCertificateDate(projectStartDate)} to ${formatCertificateDate(projectEndDate)}.`,
@@ -262,7 +261,8 @@ export function CertificateActions({
       pdf.setFont("helvetica", "normal");
       pdf.setFontSize(13);
       pdf.setTextColor(55, 65, 81);
-      pdf.text(detailLines, contentLeft + 8, 358, { lineHeightFactor: 1.55 });
+      const detailStartY = 348 + projectLines.length * 26 + 14;
+      pdf.text(detailLines, statementX, detailStartY, { lineHeightFactor: 1.55 });
 
       pdf.setFont("helvetica", "bold");
       pdf.setFontSize(10);
