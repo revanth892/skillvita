@@ -150,9 +150,8 @@ function PublicCertificateSheet({
             </h2>
             <dl className="mt-5 grid gap-4">
               <MetaRow label="Certificate Code" value={certificateCode} />
-              <MetaRow label="Recipient Email" value={email} />
-              <MetaRow label="Mobile Number" value={mobileNumber} />
               <MetaRow label="Reviewed By" value={reviewerEmail} />
+              <MetaRow label="Issued On" value={formatCertificateDate(issuedAt)} />
             </dl>
           </div>
         </div>
