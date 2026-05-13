@@ -88,8 +88,6 @@ function PublicCertificateSheet({
   issuedAt,
   proofText,
   certificateCode,
-  email,
-  mobileNumber,
   reviewerEmail,
   containerId,
 }: CertificateSheetProps) {
