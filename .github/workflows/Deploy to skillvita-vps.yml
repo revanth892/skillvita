@@ -1,0 +1,30 @@
+name: Deploy to SkillVita VPS
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup SSH
+        run: |
+          mkdir -p ~/.ssh
+          chmod 700 ~/.ssh
+          echo "${{ secrets.SKILLVITA_SSH_PRIVATE }}" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          ssh-keyscan -H "${{ secrets.SKILLVITA_HOST }}" >> ~/.ssh/known_hosts
+
+      - name: Deploy over SSH
+        env:
+          HOST: ${{ secrets.SKILLVITA_HOST }}
+          USER: ${{ secrets.SKILLVITA_USER }}
+        run: |
+          echo "Deploying to $USER@$HOST"
+          ssh -i ~/.ssh/id_ed25519 "$USER@$HOST" '/usr/local/bin/deploy-skillvita.sh'
