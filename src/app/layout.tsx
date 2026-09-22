@@ -1,9 +1,7 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
 import { IBM_Plex_Sans } from "next/font/google";
-import Navbar from "@/components/navbar/Navbar";
-import Footer from "@/components/landing-page/Footer";
-import ScrollToTopButton from "@/components/common/ScrollToTopButton";
+import SiteChrome from "@/components/common/SiteChrome";
 import { ThemeProvider } from "@/context/ThemeContext";
 import Preloader from "@/components/ui/PreLoader";
 import AppLoaderWrapper from "@/components/common/AppLoaderWrapper";
@@ -79,11 +77,7 @@ export default function RootLayout({
         <Suspense fallback={<Preloader />}>
           <ThemeProvider>
             <AppLoaderWrapper>
-              <Navbar />
-              <div className="mt-16 md:mt-18"></div>
-              {children}
-              <Footer />
-              <ScrollToTopButton />
+              <SiteChrome>{children}</SiteChrome>
             </AppLoaderWrapper>
           </ThemeProvider>
         </Suspense>
