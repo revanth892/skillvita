@@ -8,10 +8,10 @@ on:
 
 jobs:
   deploy:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Setup SSH
         run: |
@@ -27,4 +27,23 @@ jobs:
           USER: ${{ secrets.SKILLVITA_USER }}
         run: |
           echo "Deploying to $USER@$HOST"
-          ssh -i ~/.ssh/id_ed25519 "$USER@$HOST" '/usr/local/bin/deploy-skillvita.sh'
+          ssh -o ServerAliveInterval=30 -i ~/.ssh/id_ed25519 "$USER@$HOST" 'bash -s' << 'EOF'
+          set +e
+          /usr/local/bin/deploy-skillvita.sh
+          deploy_rc=$?
+
+          # The deploy script curls :3000 immediately after `pm2 restart`.
+          # Next.js is not listening yet, so curl exits 7 even when PM2 is online.
+          for i in $(seq 1 20); do
+            code=$(curl -sS -o /dev/null -w "%{http_code}" --max-time 3 http://127.0.0.1:3000/ || echo 000)
+            echo "health try ${i}=${code}"
+            if echo "$code" | grep -qE '^(200|301|302|307|308)$'; then
+              exit 0
+            fi
+            sleep 2
+          done
+
+          echo "Health check still failing after retries"
+          pm2 describe skillvita || true
+          exit "${deploy_rc:-1}"
+          EOF
