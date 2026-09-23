@@ -1,0 +1,81 @@
+name: Bootstrap hiring portal on SkillVita VPS
+
+# One-time / idempotent setup so hiring-portal GHA can deploy to this VPS.
+on:
+  workflow_dispatch:
+
+jobs:
+  bootstrap:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Setup SSH
+        run: |
+          mkdir -p ~/.ssh
+          chmod 700 ~/.ssh
+          echo "${{ secrets.SKILLVITA_SSH_PRIVATE }}" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          ssh-keyscan -H "${{ secrets.SKILLVITA_HOST }}" >> ~/.ssh/known_hosts
+
+      - name: Create dirs, authorize GHA key, write nginx
+        env:
+          HOST: ${{ secrets.SKILLVITA_HOST }}
+          USER: ${{ secrets.SKILLVITA_USER }}
+        run: |
+          ssh -o ServerAliveInterval=30 -i ~/.ssh/id_ed25519 "$USER@$HOST" 'bash -s' << 'EOF'
+          set -euo pipefail
+          APP_BASE=/var/www/skillvita/hiring-portal
+          mkdir -p "$APP_BASE/releases" "$HOME/.ssh"
+          chmod 700 "$HOME/.ssh"
+          AUTH="$HOME/.ssh/authorized_keys"
+          touch "$AUTH"
+          chmod 600 "$AUTH"
+          PUB='ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIO2oU3D72AEToKM2/IRhzw1ZVLTtq5Z9KFXpae4wrCK/ gha-skillvita-vps'
+          if ! grep -qF "$PUB" "$AUTH"; then
+            echo "$PUB" >> "$AUTH"
+            echo "authorized gha-skillvita-vps"
+          else
+            echo "gha-skillvita-vps already authorized"
+          fi
+
+          NGINX_SRC='/tmp/hiring.skillvita.in.conf'
+          cat > "$NGINX_SRC" << 'NGINX'
+          server {
+              listen 80;
+              listen [::]:80;
+              server_name hiring.skillvita.in;
+
+              client_max_body_size 50M;
+
+              location /.well-known/acme-challenge/ {
+                  root /var/www/html;
+              }
+
+              location / {
+                  proxy_pass http://127.0.0.1:3002;
+                  proxy_http_version 1.1;
+                  proxy_set_header Host $host;
+                  proxy_set_header X-Real-IP $remote_addr;
+                  proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+                  proxy_set_header X-Forwarded-Proto $scheme;
+                  proxy_set_header Upgrade $http_upgrade;
+                  proxy_set_header Connection "upgrade";
+                  proxy_read_timeout 300s;
+              }
+          }
+          NGINX
+
+          if sudo -n true 2>/dev/null; then
+            sudo mkdir -p /var/www/html
+            sudo cp "$NGINX_SRC" /etc/nginx/sites-available/hiring.skillvita.in
+            sudo ln -sfn /etc/nginx/sites-available/hiring.skillvita.in /etc/nginx/sites-enabled/hiring.skillvita.in
+            sudo nginx -t
+            sudo systemctl reload nginx
+            echo "nginx hiring.skillvita.in enabled"
+          else
+            echo "WARN: no passwordless sudo; nginx not installed. App dir is ready."
+          fi
+
+          echo "base=$APP_BASE"
+          ls -ld "$APP_BASE" "$APP_BASE/releases"
+          pm2 status || true
+          EOF
